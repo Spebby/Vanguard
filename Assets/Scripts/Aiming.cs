@@ -15,34 +15,18 @@ public class Aiming : MonoBehaviour {
     @InputSystem_Actions.PlayerActions _playerMap;
     PlayerInput _input;
 
-    // TODO: update these to IGNORE start and stop on mouse controls.
-    void StartLFire(InputAction.CallbackContext ctx) {
-        if (_activeScheme != ControlScheme.Gamepad) return;
-        _leftGun.StartShooting();
-    }
-
-    void StopLFire(InputAction.CallbackContext ctx) {
-        if (_activeScheme != ControlScheme.Gamepad) return;
-        _leftGun.StopShooting();
-    }
-
-    void StartRFire(InputAction.CallbackContext obj) {
-        if (_activeScheme != ControlScheme.Gamepad) return;
-        _rightGun.StartShooting();
-    }
-
-    void StopRFire(InputAction.CallbackContext obj) {
-        if (_activeScheme != ControlScheme.Gamepad) return;
-        _rightGun.StopShooting();
-    }
+    void StartLFire(InputAction.CallbackContext ctx) => _leftGun.StartShooting();
+    void StopLFire(InputAction.CallbackContext ctx)  => _leftGun.StopShooting();
+    void StartRFire(InputAction.CallbackContext obj) => _rightGun.StartShooting();
+    void StopRFire(InputAction.CallbackContext obj)  => _rightGun.StopShooting();
 
     Gun _leftGun;
     Gun _rightGun;
 
     ControlScheme _activeScheme;
     
+    #region Unity Boilerplate
     void Awake() {
-        // find guns
         Gun[] guns = GetComponentsInChildren<Gun>();
         if (guns.Length != 2) {
             Debug.LogWarning($"Unexpected number of guns {guns.Length}");
@@ -59,41 +43,38 @@ public class Aiming : MonoBehaviour {
         _input.onControlsChanged += ChangeControlScheme;
     }
 
+    void OnEnable() {
+        ChangeControlScheme(_input);
+        _actions.Enable();
+        _playerMap.LAim.performed += AimLeft;
+        _playerMap.RAim.performed += AimRight;
+
+        _playerMap.LShoot.started  += StartLFire;
+        _playerMap.LShoot.canceled += StopLFire;
+        _playerMap.RShoot.started  += StartRFire;
+        _playerMap.RShoot.canceled += StopRFire;
+    }
+
+    void OnDisable() {
+        _actions.Disable();
+        _playerMap.LAim.performed -= AimLeft;
+        _playerMap.RAim.performed -= AimRight;
+        
+        _playerMap.LShoot.started  -= StartLFire;
+        _playerMap.LShoot.canceled -= StopLFire;
+        _playerMap.RShoot.started  -= StartRFire;
+        _playerMap.RShoot.canceled -= StopRFire;
+    }
+    #endregion
+    
     void ChangeControlScheme(PlayerInput obj) {
         _activeScheme = obj.currentControlScheme switch {
             "Gamepad"        => ControlScheme.Gamepad,
             "Keyboard&Mouse" => ControlScheme.Mouse,
             _                => throw new NotImplementedException()
         };
-
-        if (!gameObject.activeSelf || _activeScheme != ControlScheme.Gamepad) return;
-        _playerMap.LAim.started  += StartLFire;
-        _playerMap.LAim.canceled += StopLFire;
-
-        _playerMap.RAim.started  += StartRFire;
-        _playerMap.RAim.canceled += StopRFire;
     }
-
-    void OnEnable() {
-        _actions.Enable();
-        ChangeControlScheme(_input);
-        _playerMap.LAim.performed += AimLeft;
-        _playerMap.RAim.performed += AimRight;
-    }
-
-    void OnDisable() {
-        _actions.Disable();
-        _playerMap.LAim.started   -= StartLFire;
-        _playerMap.LAim.canceled  -= StopLFire;
-        _playerMap.LAim.performed -= AimLeft;
-
-        _playerMap.RAim.started   -= StartRFire;
-        _playerMap.RAim.canceled  -= StopRFire;
-        _playerMap.RAim.performed -= AimRight;
-    }
-
-    // We deliver the aiming positions in absolute space. If we are on analog, then we need to offset this position
-    // if we are on mouse, then we do not offset and pass directly to the gun's aiming functions
+    
     void AimLeft(InputAction.CallbackContext ctx) {
         _lReticle = AimGun(_leftGun, ctx.ReadValue<Vector2>(), _activeScheme);
         _leftGun.Target = _lReticle;
@@ -104,7 +85,11 @@ public class Aiming : MonoBehaviour {
         _rightGun.Target = _rReticle;
     }
 
+    // Gamepad uses relative coordinates, mouse position uses screen coordinates.
+    // Gamepad needs an offset, and mouse position needs to be mapped screenspace -> worldspace
+    // If "no movement" has happened this input update, use the previous target (to prevent aiming at a default position)
     static Vector2 AimGun(in Gun gun, in Vector2 target, ControlScheme scheme) {
+        // This check is done first b/c Unity switches inputs before firing event that control schemes have changed
         if (target.magnitude <= Mathf.Epsilon) return gun.Target;
         if (scheme == ControlScheme.Mouse) {
             return Camera.main!.ScreenToWorldPoint(target);

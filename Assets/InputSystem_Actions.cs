@@ -127,6 +127,24 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""LShoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""91f5db35-c587-4fd1-b5c6-c0cc251c735e"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""RShoot"",
+                    ""type"": ""Button"",
+                    ""id"": ""26a907ce-0e4f-4215-b635-6ffd26a295d9"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -135,7 +153,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""id"": ""978bfe49-cc26-4a3d-ab7b-7d7a29327403"",
                     ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone(min=0.8,max=0.8),NormalizeVector2"",
+                    ""processors"": ""StickDeadzone(min=0.6,max=0.6),NormalizeVector2"",
                     ""groups"": "";Gamepad"",
                     ""action"": ""LAim"",
                     ""isComposite"": false,
@@ -157,7 +175,7 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""id"": ""c1f7a91b-d0fd-4a62-997e-7fb9b69bf235"",
                     ""path"": ""<Gamepad>/rightStick"",
                     ""interactions"": """",
-                    ""processors"": ""StickDeadzone(min=0.8,max=0.8),NormalizeVector2"",
+                    ""processors"": ""StickDeadzone(min=0.6,max=0.6),NormalizeVector2"",
                     ""groups"": "";Gamepad"",
                     ""action"": ""RAim"",
                     ""isComposite"": false,
@@ -371,6 +389,50 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
                     ""action"": ""Dodge"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""900361ef-6243-47de-b9ec-70fc06dcbe01"",
+                    ""path"": ""<Mouse>/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""LShoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0ec916e8-c587-4b0f-8f4c-744a034664ab"",
+                    ""path"": ""<Gamepad>/leftStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""LShoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b9b268d7-7363-4616-93e7-6095434cdec0"",
+                    ""path"": ""<Mouse>/press"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Keyboard&Mouse"",
+                    ""action"": ""RShoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""078e9491-e897-4246-878e-11d019cbb20d"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": "";Gamepad"",
+                    ""action"": ""RShoot"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         },
@@ -960,6 +1022,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         m_Player_RAim = m_Player.FindAction("RAim", throwIfNotFound: true);
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Dodge = m_Player.FindAction("Dodge", throwIfNotFound: true);
+        m_Player_LShoot = m_Player.FindAction("LShoot", throwIfNotFound: true);
+        m_Player_RShoot = m_Player.FindAction("RShoot", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -1057,6 +1121,8 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_RAim;
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Dodge;
+    private readonly InputAction m_Player_LShoot;
+    private readonly InputAction m_Player_RShoot;
     /// <summary>
     /// Provides access to input actions defined in input action map "Player".
     /// </summary>
@@ -1084,6 +1150,14 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "Player/Dodge".
         /// </summary>
         public InputAction @Dodge => m_Wrapper.m_Player_Dodge;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/LShoot".
+        /// </summary>
+        public InputAction @LShoot => m_Wrapper.m_Player_LShoot;
+        /// <summary>
+        /// Provides access to the underlying input action "Player/RShoot".
+        /// </summary>
+        public InputAction @RShoot => m_Wrapper.m_Player_RShoot;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -1122,6 +1196,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Dodge.started += instance.OnDodge;
             @Dodge.performed += instance.OnDodge;
             @Dodge.canceled += instance.OnDodge;
+            @LShoot.started += instance.OnLShoot;
+            @LShoot.performed += instance.OnLShoot;
+            @LShoot.canceled += instance.OnLShoot;
+            @RShoot.started += instance.OnRShoot;
+            @RShoot.performed += instance.OnRShoot;
+            @RShoot.canceled += instance.OnRShoot;
         }
 
         /// <summary>
@@ -1145,6 +1225,12 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
             @Dodge.started -= instance.OnDodge;
             @Dodge.performed -= instance.OnDodge;
             @Dodge.canceled -= instance.OnDodge;
+            @LShoot.started -= instance.OnLShoot;
+            @LShoot.performed -= instance.OnLShoot;
+            @LShoot.canceled -= instance.OnLShoot;
+            @RShoot.started -= instance.OnRShoot;
+            @RShoot.performed -= instance.OnRShoot;
+            @RShoot.canceled -= instance.OnRShoot;
         }
 
         /// <summary>
@@ -1473,6 +1559,20 @@ public partial class @InputSystem_Actions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnDodge(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "LShoot" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnLShoot(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "RShoot" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnRShoot(InputAction.CallbackContext context);
     }
     /// <summary>
     /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "UI" which allows adding and removing callbacks.

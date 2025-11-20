@@ -41,6 +41,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "LShoot",
+                    "type": "Button",
+                    "id": "91f5db35-c587-4fd1-b5c6-c0cc251c735e",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RShoot",
+                    "type": "Button",
+                    "id": "26a907ce-0e4f-4215-b635-6ffd26a295d9",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -49,7 +67,7 @@
                     "id": "978bfe49-cc26-4a3d-ab7b-7d7a29327403",
                     "path": "<Gamepad>/leftStick",
                     "interactions": "",
-                    "processors": "StickDeadzone(min=0.8,max=0.8),NormalizeVector2",
+                    "processors": "StickDeadzone(min=0.6,max=0.6),NormalizeVector2",
                     "groups": ";Gamepad",
                     "action": "LAim",
                     "isComposite": false,
@@ -71,7 +89,7 @@
                     "id": "c1f7a91b-d0fd-4a62-997e-7fb9b69bf235",
                     "path": "<Gamepad>/rightStick",
                     "interactions": "",
-                    "processors": "StickDeadzone(min=0.8,max=0.8),NormalizeVector2",
+                    "processors": "StickDeadzone(min=0.6,max=0.6),NormalizeVector2",
                     "groups": ";Gamepad",
                     "action": "RAim",
                     "isComposite": false,
@@ -285,6 +303,50 @@
                     "action": "Dodge",
                     "isComposite": false,
                     "isPartOfComposite": true
+                },
+                {
+                    "name": "",
+                    "id": "900361ef-6243-47de-b9ec-70fc06dcbe01",
+                    "path": "<Mouse>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "LShoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0ec916e8-c587-4b0f-8f4c-744a034664ab",
+                    "path": "<Gamepad>/leftStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "LShoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b9b268d7-7363-4616-93e7-6095434cdec0",
+                    "path": "<Mouse>/press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Keyboard&Mouse",
+                    "action": "RShoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "078e9491-e897-4246-878e-11d019cbb20d",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Gamepad",
+                    "action": "RShoot",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
