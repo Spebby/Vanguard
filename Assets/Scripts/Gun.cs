@@ -1,10 +1,10 @@
-using System;
 using Gilzoide.UpdateManager;
 using UnityEngine;
 
 
+[assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Runtime.Editor")]
 public class Gun : MonoBehaviour, IFixedUpdatable, ILateUpdatable {
-    [SerializeField] GunConfig config;
+    [SerializeField] internal GunConfig config;
     [HideInInspector] public Vector2 Target { get; set; }
     public Vector3 Tip => transform.up + transform.position;
     

@@ -25,24 +25,6 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Move",
-                    "type": "Value",
-                    "id": "8335e36c-f346-4a8c-aaec-c71fb941c226",
-                    "expectedControlType": "Axis",
-                    "processors": "Clamp(min=-1,max=1)",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
-                    "name": "Dodge",
-                    "type": "Value",
-                    "id": "fee989d3-5d98-4011-929f-aee715e8ab29",
-                    "expectedControlType": "Axis",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
-                },
-                {
                     "name": "LShoot",
                     "type": "Button",
                     "id": "91f5db35-c587-4fd1-b5c6-c0cc251c735e",
@@ -59,6 +41,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Move",
+                    "type": "PassThrough",
+                    "id": "8335e36c-f346-4a8c-aaec-c71fb941c226",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Dodge",
+                    "type": "Value",
+                    "id": "fee989d3-5d98-4011-929f-aee715e8ab29",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -109,7 +109,7 @@
                 {
                     "name": "Triggers",
                     "id": "d771f75f-c749-4363-bdcd-a14ef632360f",
-                    "path": "1DAxis",
+                    "path": "1DAxis(whichSideWins=1)",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -142,7 +142,7 @@
                 {
                     "name": "Keyboard",
                     "id": "3edebf8e-684c-441e-bf57-9e5aaf686f21",
-                    "path": "1DAxis",
+                    "path": "1DAxis(whichSideWins=1)",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -175,7 +175,7 @@
                 {
                     "name": "Arrows",
                     "id": "ff106de7-35c5-4fc0-a7c5-8bb5c8fd8621",
-                    "path": "1DAxis",
+                    "path": "1DAxis(whichSideWins=2)",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
