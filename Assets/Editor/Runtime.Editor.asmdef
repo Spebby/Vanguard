@@ -1,0 +1,18 @@
+{
+    "name": "Runtime.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:34a2ee35445a8c1ef8aaeeee816b11d4"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

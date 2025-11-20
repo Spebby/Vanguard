@@ -1,20 +1,16 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static InputHelper;
 
-
-enum ControlScheme : byte {
-    Gamepad,
-    Mouse,
-    None
-}
 
 [RequireComponent(typeof(PlayerInput))]
 public class Aiming : MonoBehaviour {
     @InputSystem_Actions _actions;
     @InputSystem_Actions.PlayerActions _playerMap;
     PlayerInput _input;
+    ControlScheme _activeScheme;
 
+    void UpdateControlScheme(PlayerInput obj) => _activeScheme = GetControlScheme(obj);
     void StartLFire(InputAction.CallbackContext ctx) => _leftGun.StartShooting();
     void StopLFire(InputAction.CallbackContext ctx)  => _leftGun.StopShooting();
     void StartRFire(InputAction.CallbackContext obj) => _rightGun.StartShooting();
@@ -23,7 +19,6 @@ public class Aiming : MonoBehaviour {
     Gun _leftGun;
     Gun _rightGun;
 
-    ControlScheme _activeScheme;
     
     #region Unity Boilerplate
     void Awake() {
@@ -40,11 +35,11 @@ public class Aiming : MonoBehaviour {
         _playerMap = _actions.Player;
 
         _input = GetComponent<PlayerInput>();
-        _input.onControlsChanged += ChangeControlScheme;
+        _input.onControlsChanged += UpdateControlScheme;
     }
 
     void OnEnable() {
-        ChangeControlScheme(_input);
+        UpdateControlScheme(_input);
         _actions.Enable();
         _playerMap.LAim.performed += AimLeft;
         _playerMap.RAim.performed += AimRight;
@@ -66,14 +61,6 @@ public class Aiming : MonoBehaviour {
         _playerMap.RShoot.canceled -= StopRFire;
     }
     #endregion
-    
-    void ChangeControlScheme(PlayerInput obj) {
-        _activeScheme = obj.currentControlScheme switch {
-            "Gamepad"        => ControlScheme.Gamepad,
-            "Keyboard&Mouse" => ControlScheme.Mouse,
-            _                => throw new NotImplementedException()
-        };
-    }
     
     void AimLeft(InputAction.CallbackContext ctx) {
         _lReticle = AimGun(_leftGun, ctx.ReadValue<Vector2>(), _activeScheme);

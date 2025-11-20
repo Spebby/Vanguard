@@ -1,7 +1,7 @@
 using UnityEngine;
 
 
-[CreateAssetMenu(menuName = "Scriptable Objects/Gun Config")]
+[CreateAssetMenu(fileName = "GunConfig", menuName = "Scriptable Objects/Gun Config")]
 public class GunConfig : ScriptableObject {
     [Header("Gun Settings")]
     public Bullet bulletPrefab;

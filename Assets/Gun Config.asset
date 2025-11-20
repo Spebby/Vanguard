@@ -15,3 +15,6 @@ MonoBehaviour:
   bulletPrefab: {fileID: 6333608668688406598, guid: 7fe19da995b5824e1837324198ebf182, type: 3}
   FiringSpeed: 5
   TurnSpeed: 35
+  Speed: 8
+  Lifetime: 5
+  Damage: 1
