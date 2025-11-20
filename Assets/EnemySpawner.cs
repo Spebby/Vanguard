@@ -21,8 +21,8 @@ public class EnemySpawner : MonoBehaviour
     [Tooltip("Chance to spawn enemies in multiple lanes at once (0-1)")]
     [Range(0f, 1f)] public float multiLaneSpawnChance = 0.3f;
     
-    [Header("Procedural Spawn Patterns")]
-    public bool useProceduralPatterns = true;
+    [Header("Spawn Patterns")]
+    public bool usePatterns = true;
     [Tooltip("Spawn enemies in adjacent lanes (wall pattern)")]
     [Range(0f, 1f)] public float wallPatternChance = 0.2f;
     [Tooltip("Spawn enemies in alternating lanes (zigzag pattern)")]
@@ -144,7 +144,7 @@ public class EnemySpawner : MonoBehaviour
     {
         List<int> selectedLanes = new List<int>();
         
-        if (!useProceduralPatterns || availableLanes.Count < 2)
+        if (!usePatterns || availableLanes.Count < 2)
         {
             // Simple random spawn
             int spawnCount = Random.value < multiLaneSpawnChance ? 
