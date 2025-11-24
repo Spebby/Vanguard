@@ -230,8 +230,7 @@ public class EnemySpawner : MonoBehaviour
         
         // Set lane and pass game time reference
         EnemyController controller = newEnemy.GetComponent<EnemyController>();
-        if (controller != null)
-        {
+        if (controller != null) {
             controller.SetLane(laneIndex);
             controller.SetSpawner(this);
         }
