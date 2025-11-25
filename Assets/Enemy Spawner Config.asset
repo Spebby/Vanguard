@@ -27,6 +27,6 @@ MonoBehaviour:
   MinPositionOffset: -1
   MaxPositionOffset: 4
   OffsetMultiSpawnsOnly: 0
-  BossSpawnTicks: 100
-  BossSpawnChance: 0.25
+  BossSpawnTicks: 5
+  BossSpawnChance: 0.75
   LaneGuide: {fileID: 2385382299852279795, guid: 6756879b5a773da4096d4ed41a4e9960, type: 3}

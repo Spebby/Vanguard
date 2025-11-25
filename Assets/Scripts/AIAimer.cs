@@ -2,13 +2,10 @@ using System;
 using Gilzoide.UpdateManager;
 using UnityEngine;
 
-public class AIAimer : MonoBehaviour, IFixedUpdatable {
+public class AIAimer : MonoBehaviour {
     const byte ENEMY_COLOUR = 1;
     Gun _gun;
     Transform _target;
-
-    void OnEnable() => this.RegisterInManager();
-    void OnDisable() => this.UnregisterInManager();
     
     void Awake() {
         _gun = GetComponentInChildren<Gun>();
@@ -24,9 +21,8 @@ public class AIAimer : MonoBehaviour, IFixedUpdatable {
         _gun.Colour = ENEMY_COLOUR;
     }
 
-    public void ManagedFixedUpdate() {
+    void FixedUpdate() {
         if (!_target) {
-            this.UnregisterInManager();
             _gun.StopShooting();
         }
         
