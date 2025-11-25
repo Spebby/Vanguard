@@ -100,9 +100,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6941521038173983572}
+  - component: {fileID: 310682027016468131}
   - component: {fileID: 964389985602238510}
   - component: {fileID: 6754185346314149721}
   - component: {fileID: 3361512336848285733}
+  - component: {fileID: -1072031848706181691}
   m_Layer: 0
   m_Name: Van
   m_TagString: Untagged
@@ -128,6 +130,33 @@ Transform:
   - {fileID: 8697309673709917397}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!50 &310682027016468131
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679419374611683941}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!114 &964389985602238510
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,6 +213,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moving
   body: {fileID: 1321159810031517284}
   config: {fileID: 11400000, guid: 9941f6d06e87c8849a6e36d63511974b, type: 2}
+--- !u!114 &-1072031848706181691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3679419374611683941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa11fa9565394a4eb2d145f2ebff0afa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Runtime::PlayerHealth
+  startingHealth: 3
+  invulnerabilityTime: 0.5
 --- !u!1 &4266438890477101123
 GameObject:
   m_ObjectHideFlags: 0

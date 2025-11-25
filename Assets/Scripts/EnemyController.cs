@@ -1,6 +1,6 @@
-using System.Runtime.CompilerServices;
 using Gilzoide.UpdateManager;
 using UnityEngine;
+
 
 public class EnemyController : MonoBehaviour, IFixedUpdatable {
     [Header("Movement Settings")]

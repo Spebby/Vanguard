@@ -1,17 +1,19 @@
-using System;
 using Gilzoide.UpdateManager;
 using UnityEngine;
+
 
 public class Bullet : MonoBehaviour, IFixedUpdatable {
     float _speed;
     float _lifetime;
     int _damage;
+    int _pierce;
     byte _colour;
-
-    public void Init(float speed, float lifetime, int damage, byte colour = 0) {
+    
+    public void Init(float speed, float lifetime, int damage, int pierce, byte colour = 0) {
         _speed = speed;
         _lifetime = lifetime;
         _damage = damage;
+        _pierce = pierce;
         _colour = colour;
     }
 
@@ -21,16 +23,14 @@ public class Bullet : MonoBehaviour, IFixedUpdatable {
     public void ManagedFixedUpdate() {
         transform.position += transform.up * (_speed * Time.fixedDeltaTime);
         _lifetime -= Time.fixedDeltaTime;
-        if (_lifetime <= 0) {
-            Destroy(gameObject);
-        }
+        
+        if (!(_lifetime <= 0)) return;
+        Destroy(gameObject);
     }
 
-    // New collision detection code
+    // damage mfs
     void OnTriggerEnter2D(Collider2D other) {
-        if (other.CompareTag("Enemy")) {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
-        }
+        other.GetComponent<IHealth>()?.Damage(_damage);
+        if (--_pierce <= 0) Destroy(gameObject);
     }
 }

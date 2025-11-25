@@ -16,5 +16,6 @@ MonoBehaviour:
   FiringSpeed: 5
   TurnSpeed: 35
   Speed: 10
-  Lifetime: 5
-  Damage: 1
+  Lifetime: 3
+  Damage: 5
+  Pierce: 1

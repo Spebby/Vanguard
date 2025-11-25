@@ -20,7 +20,7 @@ public class Gun : MonoBehaviour, IFixedUpdatable, ILateUpdatable {
     public void StopShooting()  => _shooting = false;
     void Shoot(Bullet obj, Vector3 origin, Quaternion rotation) {
         Bullet b = Instantiate(obj.gameObject, origin, rotation).GetComponent<Bullet>();
-        b.Init(config.Speed, config.Lifetime, config.Damage);
+        b.Init(config.Speed, config.Lifetime, config.Damage, config.Pierce);
     }
 
     public void ManagedLateUpdate() {
