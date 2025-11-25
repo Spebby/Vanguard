@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0a05219e646418199634e9e182f9a38, type: 3}
+  m_Name: Enemy Spawn Collection
+  m_EditorClassIdentifier: Runtime::EnemySpawnCollection
+  Enemies:
+  - {fileID: -8950182021474187082, guid: 42f46d744681f8c4ab8ff3ce852cbe88, type: 3}
+  Bosses:
+  - {fileID: 6479670472224027215, guid: 9db7d85b399f2bae7bd30d72a0270cc6, type: 3}

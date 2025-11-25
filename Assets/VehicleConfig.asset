@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VehicleConfig
   Speed: 5
   Dodges: 2
-  DodgeInvulnerability: 0.75
+  DodgeInvulnerability: 1.5
   DodgeRegen: 2
-  DodgeCooldown: 1.5
+  DodgeCooldown: 1
   DisableShootingTimer: 0

@@ -12,4 +12,4 @@ work.
 - Gilzoide's [Update Manager](https://github.com/gilzoide/unity-update-manager)
   - through Unity's Package Manager
 
-- [DOTween](https://assetstore.unity.com/packages/tools/animation/dotween-hotween-v2-27676)
+- [PrimeTween](https://assetstore.unity.com/packages/slug/252960)

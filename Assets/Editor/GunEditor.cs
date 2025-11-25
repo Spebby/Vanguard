@@ -18,7 +18,7 @@ namespace Editor {
             EditorPrefs.SetBool (nameof (_settingsFoldout), _settingsFoldout);
         }
 
-        void DrawSettingsEditor(Object settings, ref bool foldout, ref UnityEditor.Editor editor) {
+        static void DrawSettingsEditor(Object settings, ref bool foldout, ref UnityEditor.Editor editor) {
             if (!settings) return;
             foldout = EditorGUILayout.InspectorTitlebar(foldout, settings);
             if (!foldout) return;

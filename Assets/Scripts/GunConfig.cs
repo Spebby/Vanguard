@@ -12,4 +12,5 @@ public class GunConfig : ScriptableObject {
     public float Speed = 2f;
     [Min(0)] public float Lifetime = 5f;
     [Min(0)] public int Damage = 1;
+    [Min(0)] public int Pierce = 1;
 }

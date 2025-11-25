@@ -1,2 +1,12 @@
 fileFormatVersion: 2
-guid: d614e0cbdb2ff9c459bcd9b1e647d916
+guid: fc4bfae6c61215a3991196816db7b0cd
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - LaneGap: {fileID: 2385382299852279795, guid: 6756879b5a773da4096d4ed41a4e9960, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
