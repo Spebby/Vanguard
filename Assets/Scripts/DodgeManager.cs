@@ -1,9 +1,11 @@
 using Gilzoide.UpdateManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using PrimeTween;
 
 
 public class DodgeManager : IFixedUpdatable {
+    GameObject _parent;
     SpriteRenderer _renderer;
     VehicleConfig _config;
 
@@ -16,6 +18,7 @@ public class DodgeManager : IFixedUpdatable {
     
     public DodgeManager(SpriteRenderer renderer, VehicleConfig config) {
         _renderer = renderer;
+        _parent = renderer.transform.parent.gameObject;
         _config = config;
 
         _currentDodges = config.Dodges;
@@ -34,6 +37,11 @@ public class DodgeManager : IFixedUpdatable {
     public void Dodge(InputAction.CallbackContext ctx) {
         if (_currentDodges == 0 || _dodgeCooldown > Mathf.Epsilon) return;
 
+        Sequence.Create()
+                .Chain(Tween.Scale(_parent.transform, 1.5f, _config.DodgeInvulnerability * 0.75f, Ease.OutSine))
+                .Chain(Tween.Scale(_parent.transform, 1.0f, _config.DodgeInvulnerability * 0.25f, Ease.InSine))
+                .ChainCallback(() => _renderer.color = Color.white);
+        
         _currentDodges--;
         _renderer.color = _dodgeColor;
         _dodgeInvulnerability = _config.DodgeInvulnerability;
@@ -44,10 +52,6 @@ public class DodgeManager : IFixedUpdatable {
         _dodgeCooldown        -= Time.deltaTime;
         _regenTimer           -= Time.fixedDeltaTime;
         _dodgeInvulnerability -= Time.deltaTime;
-
-        if (_dodgeInvulnerability <= Mathf.Epsilon) {
-            _renderer.color = Color.white;
-        }
         
         if (!(_regenTimer <= Mathf.Epsilon) || _currentDodges >= _config.Dodges) return;
         _currentDodges++;
