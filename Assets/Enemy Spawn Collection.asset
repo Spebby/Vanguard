@@ -14,3 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Runtime::EnemySpawnCollection
   Enemies:
   - {fileID: -8950182021474187082, guid: 42f46d744681f8c4ab8ff3ce852cbe88, type: 3}
+  Bosses:
+  - {fileID: 6479670472224027215, guid: 9db7d85b399f2bae7bd30d72a0270cc6, type: 3}

@@ -32,6 +32,10 @@ public class EnemySpawnerConfig : ScriptableObject {
 
     [Tooltip("Apply offset only when spawning multiple enemies simultaneously")]
     public bool OffsetMultiSpawnsOnly = true;
+
+    [Header("Boss Settings")]
+    public float BossSpawnTicks = 100;
+    public float BossSpawnChance = 0.25f;
     
     [Header("Misc")]
     public GameObject LaneGuide;

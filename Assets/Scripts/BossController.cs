@@ -2,10 +2,9 @@ using System;
 using UnityEngine;
 
 
-public class EnemyController : MonoBehaviour {
+public class BossController : MonoBehaviour {
     [Header("Movement Settings")] [SerializeField]
-    internal float BaseMoveSpeed = 3f;
-    [SerializeField] internal float SpeedIncreasePerSecond = 0.1f;
+    internal float BaseMoveSpeed = 1f;
     [SerializeField] internal float MaxMoveSpeed = 15f;
     public Vector3 MoveDirection = Vector3.down;
     
@@ -22,9 +21,10 @@ public class EnemyController : MonoBehaviour {
         OnDeath?.Invoke();
     }
 
+    
     internal void Initialise() {
         CurrentMoveSpeed = BaseMoveSpeed;
-        Rb = GetComponent<Rigidbody2D>();
+        Rb               = GetComponent<Rigidbody2D>();
 
         if (MoveDirection == Vector3.zero) return;
         float angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;

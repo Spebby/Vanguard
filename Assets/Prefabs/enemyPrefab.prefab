@@ -93,7 +93,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -179,12 +179,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 722bdf1be7e9e71459385ffd10f2e07f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  baseMoveSpeed: 3
-  speedIncreasePerSecond: 0.1
-  maxMoveSpeed: 15
-  moveDirection: {x: 0, y: -1, z: 0}
-  rotateTowardsMovement: 0
-  destroyBelowY: -10
+  BaseMoveSpeed: 3
+  SpeedIncreasePerSecond: 0.1
+  MaxMoveSpeed: 15
+  MoveDirection: {x: 0, y: -1, z: 0}
 --- !u!114 &-2826823075452237277
 MonoBehaviour:
   m_ObjectHideFlags: 0

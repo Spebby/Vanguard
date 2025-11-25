@@ -5,7 +5,8 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour, IHealth, IFixedUpdatable {
     [SerializeField] int startingHealth;
     public int Health { get; protected set; }
-
+    public byte Colour { get; protected set; } = 0;
+    
     void Start() {
         Health = startingHealth;
     }
@@ -19,16 +20,17 @@ public class PlayerHealth : MonoBehaviour, IHealth, IFixedUpdatable {
     
     
     public void Heal(int amount) => Health += amount;
-    public void Damage(int amount) {
-        if (_iTime < 0) return;
-        Health += amount;
+    public void Damage(int amount, byte colour) {
+        if (Colour == colour || 0 < _iTime) return;
+        
+        Health -= amount;
         _iTime =  invulnerabilityTime;
 
         if (Health <= 0) Die();
     }
 
     public void Die() {
-        Destroy(this.gameObject);
+        Destroy(gameObject);
     }
 
     public void ManagedFixedUpdate() {

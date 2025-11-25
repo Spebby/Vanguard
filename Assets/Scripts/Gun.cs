@@ -5,8 +5,10 @@ using UnityEngine;
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Runtime.Editor")]
 public class Gun : MonoBehaviour, IFixedUpdatable, ILateUpdatable {
     [SerializeField] internal GunConfig config;
-    [HideInInspector] public Vector2 Target { get; set; }
+    public Vector2 Target { get; set; }
     public Vector3 Tip => transform.up + transform.position;
+    
+    public byte Colour { get; internal set; }
     
     bool _shooting;
     float _fireDelay;
@@ -20,7 +22,7 @@ public class Gun : MonoBehaviour, IFixedUpdatable, ILateUpdatable {
     public void StopShooting()  => _shooting = false;
     void Shoot(Bullet obj, Vector3 origin, Quaternion rotation) {
         Bullet b = Instantiate(obj.gameObject, origin, rotation).GetComponent<Bullet>();
-        b.Init(config.Speed, config.Lifetime, config.Damage, config.Pierce);
+        b.Init(config.Speed, config.Lifetime, config.Damage, config.Pierce, Colour);
     }
 
     public void ManagedLateUpdate() {
@@ -32,10 +34,10 @@ public class Gun : MonoBehaviour, IFixedUpdatable, ILateUpdatable {
     
     public void ManagedFixedUpdate() {
         _fireDelay -= Time.deltaTime;
-        if (_shooting && _fireDelay <= 0) {
-            Shoot(config.bulletPrefab, Tip, transform.rotation);
-            _fireDelay = 1f / config.FiringSpeed;
-        }
+        if (!_shooting || !(_fireDelay <= 0)) return;
+        
+        Shoot(config.bulletPrefab, Tip, transform.rotation);
+        _fireDelay = 1f / config.FiringSpeed;
     }
     
     void OnDrawGizmos() {

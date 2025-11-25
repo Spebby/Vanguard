@@ -30,7 +30,8 @@ public class Bullet : MonoBehaviour, IFixedUpdatable {
 
     // damage mfs
     void OnTriggerEnter2D(Collider2D other) {
-        other.GetComponent<IHealth>()?.Damage(_damage);
-        if (--_pierce <= 0) Destroy(gameObject);
+        IHealth health = other.GetComponent<IHealth>();
+        health?.Damage(_damage, _colour);
+        if (health?.Colour != _colour && --_pierce <= 0) Destroy(gameObject);
     }
 }

@@ -7,14 +7,14 @@ using Random = UnityEngine.Random;
 public class EnemySpawner : MonoBehaviour {
     [SerializeField] internal EnemySpawnerConfig config;
     [SerializeField] internal EnemySpawnCollection collection;
-    
+
+    bool[] _blockedLanes;
     Transform[] _laneHeads;
     GameObject[] _laneGapObjects;
 
     float _screenTop;
     const float SPAWN_HEIGHT_OFFSET = 2f;
     float SpawnPosition => _screenTop + SPAWN_HEIGHT_OFFSET;
-    
     static float _startTime;
 
     // SOA
@@ -23,6 +23,8 @@ public class EnemySpawner : MonoBehaviour {
     EnemyController[] _enemies = new EnemyController[INIT_SIZE];
     int _capacity = INIT_SIZE;
     int _top = 0;
+    
+    BossController _boss;
 
     void Awake() {
         _startTime = Time.time;
@@ -32,6 +34,7 @@ public class EnemySpawner : MonoBehaviour {
         float totalWidth = config.Lanes * config.LaneWidth;
         float startX     = -totalWidth / 2;
 
+        _blockedLanes = new bool[config.Lanes];
         _laneHeads = new Transform[config.Lanes];
         for (int i = 0; i < config.Lanes; i++) {
             float x = startX + i * config.LaneWidth;
@@ -79,6 +82,7 @@ public class EnemySpawner : MonoBehaviour {
     }
 
     void UpdateEnemies(EnemyController[] enemies, int[] enemy2Lane) {
+        // mass enemies
         Span<int> dead    = stackalloc int[_top];
         int       deadTop = 0;
         
@@ -94,6 +98,26 @@ public class EnemySpawner : MonoBehaviour {
         // destroy in bulk
         foreach (int i in dead[..deadTop]) {
             Unsubscribe(i);
+        }
+        
+        
+        // Handle boss movement
+        Array.Clear(_blockedLanes, 0, _blockedLanes.Length);
+        if (!_boss) return; 
+        float bossLeft  = 0;
+        float bossRight = 0;
+
+        
+        for (int lane = 0; lane < config.Lanes; lane++) {
+            float laneCenter = _laneHeads[lane].position.x;
+            float halfWidth  = config.LaneWidth * 0.5f;
+
+            float laneLeft  = laneCenter - halfWidth;
+            float laneRight = laneCenter + halfWidth;
+
+            // Axis overlap test
+            if (laneRight >= bossLeft && laneLeft <= bossRight)
+                _blockedLanes[lane] = true;
         }
     }
 
