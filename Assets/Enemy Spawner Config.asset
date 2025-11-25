@@ -14,17 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Runtime::EnemySpawnerConfig
   Lanes: 5
   LaneWidth: 2
-  SpawnInterval: 4
+  SpawnInterval: 5
   MaxEnemiesPerLane: 3
   MinSimultaneousSpawns: 1
   MaxSimultaneousSpawns: 3
-  MultiLaneSpawnChance: 0.3
+  MultiLaneSpawnChance: 0.15
   WallPatternWeight: 15
   ZigZagPatternWeight: 25
   EdgePatternWeight: 10
-  DifficultyIncreaseRate: 2
+  DifficultyIncreaseRate: 0.075
   MinSpawnInterval: 0.5
-  MinPositionOffset: 1
-  MaxPositionOffset: 2
-  OffsetMultiSpawnsOnly: 1
+  MinPositionOffset: -1
+  MaxPositionOffset: 4
+  OffsetMultiSpawnsOnly: 0
+  BossSpawnTicks: 100
+  BossSpawnChance: 0.25
   LaneGuide: {fileID: 2385382299852279795, guid: 6756879b5a773da4096d4ed41a4e9960, type: 3}

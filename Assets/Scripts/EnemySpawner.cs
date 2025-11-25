@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
+using PrimeTween; // using tweens for physics movement is the dumbest shit on earth but IDGAF!
 
 
 public class EnemySpawner : MonoBehaviour {
@@ -57,6 +58,8 @@ public class EnemySpawner : MonoBehaviour {
             vis.transform.localScale = visGapScaling;
             _laneGapObjects[i]       = vis;
         }
+
+        _lastBossSpawnTime = config.BossSpawnTicks * 2f;
     }
     
     static float GameTime => Time.time - _startTime;
@@ -69,6 +72,7 @@ public class EnemySpawner : MonoBehaviour {
     }
 
     float _lastSpawnTime;
+    float _lastBossSpawnTime;
     void FixedUpdate() {
         UpdateEnemies(_enemies, _enemy2Lane);
         
@@ -79,6 +83,9 @@ public class EnemySpawner : MonoBehaviour {
         if (!(Time.time - _lastSpawnTime >= currentInterval)) return;
         SpawnEnemies();
         _lastSpawnTime = Time.time;
+        
+        if (_boss || !(Time.time - _lastBossSpawnTime >= currentInterval)) return;
+        
     }
 
     void UpdateEnemies(EnemyController[] enemies, int[] enemy2Lane) {
@@ -90,7 +97,7 @@ public class EnemySpawner : MonoBehaviour {
             EnemyController enemy = enemies[i];
             enemy.Rb.linearVelocity = enemy.MoveDirection.normalized * enemy.CurrentMoveSpeed;
             
-            if (enemy.transform.position.y < -(_screenTop * 1.1f)) {
+            if (enemy.transform.position.y < -(_screenTop * 2f)) {
                 dead[deadTop++] = i;
             }
         }

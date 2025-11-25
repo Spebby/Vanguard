@@ -8,6 +8,8 @@ public class EnemyController : MonoBehaviour {
     [SerializeField] internal float SpeedIncreasePerSecond = 0.1f;
     [SerializeField] internal float MaxMoveSpeed = 15f;
     public Vector3 MoveDirection = Vector3.down;
+
+    const byte Colour = 1;
     
     [Header("Boundaries")]
     public float CurrentMoveSpeed { get; internal set; }
@@ -29,5 +31,11 @@ public class EnemyController : MonoBehaviour {
         if (MoveDirection == Vector3.zero) return;
         float angle = Mathf.Atan2(MoveDirection.y, MoveDirection.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle - 90f, Vector3.forward);
+    }
+
+    void OnTriggerEnter2D(Collider2D other) {
+        PlayerHealth health = other.GetComponent<PlayerHealth>();
+        health?.Damage(1, 1);
+        if (health) Destroy(gameObject); 
     }
 }
