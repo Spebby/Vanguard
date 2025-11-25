@@ -22,10 +22,14 @@ public class AIAimer : MonoBehaviour, IFixedUpdatable {
         }
 
         _gun.Colour = ENEMY_COLOUR;
-        _gun.StartShooting();
     }
 
     public void ManagedFixedUpdate() {
+        if (!_target) {
+            this.UnregisterInManager();
+            _gun.StopShooting();
+        }
+        
         _gun.Target = _target.position;
     }
 }

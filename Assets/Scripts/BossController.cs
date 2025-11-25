@@ -5,6 +5,7 @@ using UnityEngine;
 public class BossController : MonoBehaviour {
     [Header("Movement Settings")] [SerializeField]
     internal float BaseMoveSpeed = 1f;
+    [SerializeField] internal float SpeedIncreasePerSecond = 0.1f;
     [SerializeField] internal float MaxMoveSpeed = 15f;
     public Vector3 MoveDirection = Vector3.down;
     

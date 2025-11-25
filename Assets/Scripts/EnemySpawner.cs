@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using PrimeTween; // using tweens for physics movement is the dumbest shit on earth but IDGAF!
@@ -84,8 +85,8 @@ public class EnemySpawner : MonoBehaviour {
         SpawnEnemies();
         _lastSpawnTime = Time.time;
         
-        if (_boss || !(Time.time - _lastBossSpawnTime >= currentInterval)) return;
-        
+        if (_boss || !(Time.time - _lastBossSpawnTime >= config.BossSpawnTicks)) return;
+        SpawnBoss();
     }
 
     void UpdateEnemies(EnemyController[] enemies, int[] enemy2Lane) {
@@ -110,21 +111,22 @@ public class EnemySpawner : MonoBehaviour {
         
         // Handle boss movement
         Array.Clear(_blockedLanes, 0, _blockedLanes.Length);
-        if (!_boss) return; 
-        float bossLeft  = 0;
-        float bossRight = 0;
-
+        if (!_boss) return;
+        
+        Bounds bounds = _boss.GetComponent<BoxCollider2D>().bounds;
+        float bossLeft  =  bounds.max.x;
+        float bossRight = -bounds.min.x;
         
         for (int lane = 0; lane < config.Lanes; lane++) {
             float laneCenter = _laneHeads[lane].position.x;
             float halfWidth  = config.LaneWidth * 0.5f;
-
-            float laneLeft  = laneCenter - halfWidth;
-            float laneRight = laneCenter + halfWidth;
+            float laneLeft   = laneCenter - halfWidth;
+            float laneRight  = laneCenter + halfWidth;
 
             // Axis overlap test
-            if (laneRight >= bossLeft && laneLeft <= bossRight)
-                _blockedLanes[lane] = true;
+            bool leftInRange    = laneLeft  <= bossLeft  && bossLeft  <= laneRight;
+            bool rightInRange   = laneRight <= bossRight && bossRight <= laneLeft;
+            _blockedLanes[lane] = leftInRange || rightInRange;
         }
     }
 
@@ -137,8 +139,9 @@ public class EnemySpawner : MonoBehaviour {
             int lane = _enemy2Lane[i];
             laneCounts[lane]++;
         }
+        
         for (int lane = 0; lane < config.Lanes; lane++) {
-            if (laneCounts[lane] < config.MaxEnemiesPerLane) availableLanes.Add(lane);
+            if (laneCounts[lane] < config.MaxEnemiesPerLane && !_blockedLanes[lane]) availableLanes.Add(lane);
         }
 
         if (availableLanes.Count == 0) return;
@@ -163,8 +166,30 @@ public class EnemySpawner : MonoBehaviour {
             SpawnEnemyInLane(laneIndex, zOffset);
         }
     }
+
+    void SpawnBoss() {
+        _lastBossSpawnTime = GameTime + config.BossSpawnTicks;
+        if (Random.value > config.BossSpawnChance) return;
+        
+        int            lane     = Random.Range(0, config.Lanes);
+        BossController boss     = collection.Bosses[Random.Range(0, collection.Bosses.Length)];
+        Vector3        spawnPos = _laneHeads[lane].position;
+        spawnPos.y += GetPositionVariation();
+        
+        _boss                  = Instantiate(boss, spawnPos, Quaternion.identity);
+        _boss.CurrentMoveSpeed = Mathf.Min(boss.BaseMoveSpeed + boss.SpeedIncreasePerSecond, boss.MaxMoveSpeed);
+        _boss.Initialise();
+        _boss.OnDeath += () => {
+            _lastBossSpawnTime = GameTime + config.BossSpawnTicks;
+        }; // pad so next boss doesn't spawn immediately
+        Gun turret = _boss.GetComponentInChildren<Gun>();
+        turret.StopShooting();
+        Sequence.Create()
+                .Chain(Tween.PositionY(_boss.transform, _screenTop - _screenTop * 0.2f, 4f, Ease.OutSine))
+                .ChainCallback(() => turret.StartShooting());
+    }
     
-    float GetPositionVariation(bool isMultiSpawn) => config.OffsetMultiSpawnsOnly && !isMultiSpawn ? 0f : Random.Range(config.MinPositionOffset, config.MaxPositionOffset);
+    float GetPositionVariation(bool isMultiSpawn = true) => config.OffsetMultiSpawnsOnly && !isMultiSpawn ? 0f : Random.Range(config.MinPositionOffset, config.MaxPositionOffset);
 
     void SpawnEnemyInLane(int laneIndex, float yOffset = 0f) {
         EnemyController enemyPrefab = collection.Enemies[Random.Range(0, collection.Enemies.Length)];

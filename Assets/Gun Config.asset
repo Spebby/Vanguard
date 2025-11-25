@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Gun Config
   m_EditorClassIdentifier: Assembly-CSharp::GunConfig
   bulletPrefab: {fileID: 6333608668688406598, guid: 7fe19da995b5824e1837324198ebf182, type: 3}
-  FiringSpeed: 5
+  FiringSpeed: 4
   TurnSpeed: 35
   Speed: 10
   Lifetime: 3
