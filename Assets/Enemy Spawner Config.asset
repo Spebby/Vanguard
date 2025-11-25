@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28b09c76d41b4475a7f9a8cab422b17c, type: 3}
+  m_Name: Enemy Spawner Config
+  m_EditorClassIdentifier: Runtime::EnemySpawnerConfig
+  Lanes: 5
+  LaneWidth: 2
+  SpawnInterval: 4
+  MaxEnemiesPerLane: 3
+  MinSimultaneousSpawns: 1
+  MaxSimultaneousSpawns: 3
+  MultiLaneSpawnChance: 0.3
+  WallPatternWeight: 15
+  ZigZagPatternWeight: 25
+  EdgePatternWeight: 10
+  DifficultyIncreaseRate: 2
+  MinSpawnInterval: 0.5
+  MinPositionOffset: 1
+  MaxPositionOffset: 2
+  OffsetMultiSpawnsOnly: 1
+  LaneGuide: {fileID: 2385382299852279795, guid: 6756879b5a773da4096d4ed41a4e9960, type: 3}

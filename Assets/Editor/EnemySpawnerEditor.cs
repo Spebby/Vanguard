@@ -4,18 +4,23 @@ using UnityEngine;
 
 // Borrowed from https://github.com/SebLague/Slime-Simulation/blob/main/Assets/Scripts/Slime/Editor/SlimeEditor.cs
 namespace Editor {
-    [CustomEditor(typeof(PlayerMovement))]
-    public class PlayerMovementEditor : UnityEditor.Editor {
+    [CustomEditor(typeof(EnemySpawner))]
+    public class EnemySpawnerEditor : UnityEditor.Editor {
         UnityEditor.Editor _settingsEditor;
         bool _settingsFoldout;
+        bool _collectionFoldout;
 
         public override void OnInspectorGUI() {
             DrawDefaultInspector();
-            PlayerMovement move = target as PlayerMovement;
+            EnemySpawner spawner = target as EnemySpawner;
 
-            if (!move!.config) return;
-            DrawSettingsEditor(move.config, ref _settingsFoldout, ref _settingsEditor);
+            if (!spawner!.config) return;
+            DrawSettingsEditor(spawner.config, ref _settingsFoldout, ref _settingsEditor);
             EditorPrefs.SetBool (nameof (_settingsFoldout), _settingsFoldout);
+            
+            if (!spawner!.collection) return;
+            DrawSettingsEditor(spawner.collection, ref _collectionFoldout, ref _settingsEditor);
+            EditorPrefs.SetBool (nameof (_collectionFoldout), _collectionFoldout);
         }
 
         static void DrawSettingsEditor(Object settings, ref bool foldout, ref UnityEditor.Editor editor) {
@@ -28,6 +33,7 @@ namespace Editor {
 
         void OnEnable () {
             _settingsFoldout = EditorPrefs.GetBool (nameof (_settingsFoldout), false);
+            _collectionFoldout = EditorPrefs.GetBool (nameof (_collectionFoldout), false);
         }
     }
 }

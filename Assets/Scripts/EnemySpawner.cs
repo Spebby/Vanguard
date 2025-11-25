@@ -1,217 +1,237 @@
-using UnityEngine;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 
 public class EnemySpawner : MonoBehaviour {
-    [Header("Lane Setup")]
-    public Transform[] lanes = new Transform[5];
-    public float laneSpacing = 2f;
+    [SerializeField] internal EnemySpawnerConfig config;
+    [SerializeField] internal EnemySpawnCollection collection;
+    
+    Transform[] _laneHeads;
+    GameObject[] _laneGapObjects;
 
-    [Header("Enemy Setup")] public GameObject[] enemyPrefabs;
+    float _screenTop;
+    const float SPAWN_HEIGHT_OFFSET = 2f;
+    float SpawnPosition => _screenTop + SPAWN_HEIGHT_OFFSET;
+    
+    static float _startTime;
 
-    [Header("Spawn Settings")] public float spawnInterval = 2f;
-    public float spawnHeight = 10f;
-    public int maxEnemiesPerLane = 3;
+    // SOA
+    const int INIT_SIZE = 64;
+    int[] _enemy2Lane = new int[INIT_SIZE];
+    EnemyController[] _enemies = new EnemyController[INIT_SIZE];
+    int _capacity = INIT_SIZE;
+    int _top = 0;
 
-    [Header("Multi-Lane Spawning")] [Range(1, 5)]
-    public int minSimultaneousSpawns = 1;
+    void Awake() {
+        _startTime = Time.time;
 
-    [Range(1, 5)] public int maxSimultaneousSpawns = 3;
 
-    [Tooltip("Chance to spawn enemies in multiple lanes at once (0-1)")] [Range(0f, 1f)]
-    public float multiLaneSpawnChance = 0.3f;
+        _screenTop = Camera.main!.ScreenToWorldPoint(new Vector3(0, Screen.height, 0)).y;
+        float totalWidth = config.Lanes * config.LaneWidth;
+        float startX     = -totalWidth / 2;
 
-    [Header("Spawn Patterns")] public bool usePatterns = true;
-
-    [Tooltip("Spawn enemies in adjacent lanes (wall pattern)")] [Range(0f, 1f)]
-    public float wallPatternChance = 0.2f;
-
-    [Tooltip("Spawn enemies in alternating lanes (zigzag pattern)")] [Range(0f, 1f)]
-    public float zigzagPatternChance = 0.15f;
-
-    [Tooltip("Spawn enemies only on outer lanes (edges pattern)")] [Range(0f, 1f)]
-    public float edgesPatternChance = 0.1f;
-
-    [Header("Difficulty Scaling")] public float difficultyIncreaseRate = 0.05f;
-    public float minSpawnInterval = 0.5f;
-
-    [Header("Position Variation")] [Tooltip("Random forward/backward offset range for natural traffic spacing")]
-    public float minPositionOffset = -2f;
-
-    public float maxPositionOffset = 2f;
-
-    [Tooltip("Apply offset only when spawning multiple enemies simultaneously")]
-    public bool offsetOnlyMultiSpawns = true;
-
-    float _lastSpawnTime;
-    List<GameObject>[] _laneEnemies;
-    float _gameStartTime;
-    bool _isMultiSpawn = false;
-
-    void Start() {
-        // Initialize lane tracking
-        _laneEnemies = new List<GameObject>[5];
-        for (int i = 0; i < 5; i++) {
-            _laneEnemies[i] = new List<GameObject>();
+        _laneHeads = new Transform[config.Lanes];
+        for (int i = 0; i < config.Lanes; i++) {
+            float x = startX + i * config.LaneWidth;
+            GameObject lane = new($"Lane_{i}") {
+                transform = {
+                    parent   = transform,
+                    position = new Vector3(x + config.LaneWidth / 2, SpawnPosition, 0)
+                }
+            };
+            _laneHeads[i] = lane.transform;
         }
 
-        // Auto-create lanes if not set
-        if (!lanes[0]) {
-            CreateLanes();
+        Vector3 visGapScaling = new(config.LaneGuide.transform.localScale.x, _screenTop * 2,
+                                    config.LaneGuide.transform.localScale.z);
+        _laneGapObjects = new GameObject[config.Lanes + 1];
+        for (int i = 0; i < config.Lanes + 1; i++) {
+            GameObject vis = Instantiate(config.LaneGuide, transform);
+            vis.name                 = $"Vis_{i}";
+            vis.transform.position   = new Vector3(startX + i * config.LaneWidth, 0, 0);
+            vis.transform.localScale = visGapScaling;
+            _laneGapObjects[i]       = vis;
         }
+    }
+    
+    static float GameTime => Time.time - _startTime;
 
-        _gameStartTime = Time.time;
+    static float CurrentSpawnInterval(float spawnInterval,
+                                      float difficultyIncreaseRate,
+                                      float minSpawnInterval = 0.5f) {
+        float scaledInterval = spawnInterval - GameTime * difficultyIncreaseRate;
+        return Mathf.Max(scaledInterval, minSpawnInterval);
     }
 
-    void Update() {
-        float currentInterval = GetCurrentSpawnInterval();
-
+    float _lastSpawnTime;
+    void FixedUpdate() {
+        UpdateEnemies(_enemies, _enemy2Lane);
+        
+        float currentInterval = CurrentSpawnInterval(config.SpawnInterval,
+                                                     config.DifficultyIncreaseRate,
+                                                     config.MinSpawnInterval);
+        
         if (!(Time.time - _lastSpawnTime >= currentInterval)) return;
         SpawnEnemies();
         _lastSpawnTime = Time.time;
     }
 
-    float GetCurrentSpawnInterval() {
-        float timeSinceStart = Time.time - _gameStartTime;
-        float scaledInterval = spawnInterval - timeSinceStart * difficultyIncreaseRate;
-        return Mathf.Max(scaledInterval, minSpawnInterval);
-    }
-
-    public float GetGameTime() {
-        return Time.time - _gameStartTime;
-    }
-
-    void CreateLanes() {
-        for (int i = 0; i < 5; i++) {
-            GameObject lane = new("Lane_" + i) {
-                transform = {
-                    parent   = transform,
-                    position = new Vector3((i - 2) * laneSpacing, spawnHeight, 0)
-                }
-            };
+    void UpdateEnemies(EnemyController[] enemies, int[] enemy2Lane) {
+        Span<int> dead    = stackalloc int[_top];
+        int       deadTop = 0;
+        
+        for (int i = 0; i < _top; i++) {
+            EnemyController enemy = enemies[i];
+            enemy.Rb.linearVelocity = enemy.MoveDirection.normalized * enemy.CurrentMoveSpeed;
             
-            lanes[i] = lane.transform;
+            if (enemy.transform.position.y < -(_screenTop * 1.1f)) {
+                dead[deadTop++] = i;
+            }
+        }
+
+        // destroy in bulk
+        foreach (int i in dead[..deadTop]) {
+            Unsubscribe(i);
         }
     }
 
     void SpawnEnemies() {
-        if (enemyPrefabs.Length == 0) return;
-
         // Find available lanes
+        // could probably do this w/ LINQ but this is conceptually simpler
+        Span<int> laneCounts     = stackalloc int[config.Lanes];
         List<int> availableLanes = new();
-        for (int i = 0; i < 5; i++) {
-            CleanupDestroyedEnemies(i);
-            if (_laneEnemies[i].Count >= maxEnemiesPerLane) continue;
-            availableLanes.Add(i);
+        for (int i = 0; i < _top; i++) {
+            int lane = _enemy2Lane[i];
+            laneCounts[lane]++;
+        }
+        for (int lane = 0; lane < config.Lanes; lane++) {
+            if (laneCounts[lane] < config.MaxEnemiesPerLane) availableLanes.Add(lane);
         }
 
         if (availableLanes.Count == 0) return;
+        List<int> lanesToSpawn = GetSpawnPattern(availableLanes, config);
 
-        // Determine spawn pattern
-        List<int> lanesToSpawn = GetSpawnPattern(availableLanes);
+        // resize membership arrays
+        if (_capacity <= _top + lanesToSpawn.Count) {
+            _capacity <<= 1;
+            int[] temp1 = new int[_capacity];
+            EnemyController[] temp2 = new EnemyController[_capacity];
+            
+            Array.Copy(_enemy2Lane, temp1, _top);
+            Array.Copy(_enemies, temp2, _top);
 
-        // Track if this is a multi-spawn for position variation
-        _isMultiSpawn = lanesToSpawn.Count > 1;
-
-        // Spawn enemies in selected lanes with position variation
+            _enemy2Lane = temp1;
+            _enemies = temp2;
+        }
+        
+        bool isMultiSpawn = lanesToSpawn.Count > 1;
         foreach (int laneIndex in lanesToSpawn) {
-            float zOffset = GetPositionVariation();
+            float zOffset = GetPositionVariation(isMultiSpawn);
             SpawnEnemyInLane(laneIndex, zOffset);
         }
     }
+    
+    float GetPositionVariation(bool isMultiSpawn) => config.OffsetMultiSpawnsOnly && !isMultiSpawn ? 0f : Random.Range(config.MinPositionOffset, config.MaxPositionOffset);
 
-    // Apply variation only if enabled and conditions are met
-    float GetPositionVariation() => offsetOnlyMultiSpawns && !_isMultiSpawn ? 0f : Random.Range(minPositionOffset, maxPositionOffset);
+    void SpawnEnemyInLane(int laneIndex, float yOffset = 0f) {
+        EnemyController enemyPrefab = collection.Enemies[Random.Range(0, collection.Enemies.Length)];
+        Vector3         spawnPos    = _laneHeads[laneIndex].position;
+        spawnPos.y += yOffset;
 
-    List<int> GetSpawnPattern(List<int> availableLanes) {
+        int index = _top;   // capture stable index
+        EnemyController e = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
+        e.CurrentMoveSpeed = Mathf.Min(e.BaseMoveSpeed + e.SpeedIncreasePerSecond * GameTime, e.MaxMoveSpeed);
+        e.OnDeath += () => Unsubscribe(index);
+        e.Initialise();
+        _enemies[index] = e;
+        _enemy2Lane[index] = laneIndex;
+        
+        _top++;
+    }
+
+    void Unsubscribe(int i) {
+        // Source to remove
+        EnemyController toRemove = _enemies[i];
+        toRemove.OnDeath = null;
+
+        _top--;
+        if (i != _top) {
+            // swapback
+            _enemies[i]    = _enemies[_top];
+            _enemy2Lane[i] = _enemy2Lane[_top];
+
+            // Rebind the death callback to the new index
+            int newIndex = i;
+            _enemies[i].OnDeath = null;
+            _enemies[i].OnDeath += () => Unsubscribe(newIndex);
+        }
+
+        Destroy(toRemove.gameObject);
+    }
+
+    #region Pattern Selection
+    static List<int> GetSpawnPattern(List<int> availableLanes, EnemySpawnerConfig config) {
         List<int> selectedLanes = new();
 
-        if (!usePatterns || availableLanes.Count < 2) {
-            // Simple random spawn
-            int spawnCount = Random.value < multiLaneSpawnChance
-                ? Random.Range(minSimultaneousSpawns, maxSimultaneousSpawns + 1)
-                : 1;
-            spawnCount = Mathf.Min(spawnCount, availableLanes.Count);
-
-            for (int i = 0; i < spawnCount; i++) {
-                int randomIndex = Random.Range(0, availableLanes.Count);
-                selectedLanes.Add(availableLanes[randomIndex]);
-                availableLanes.RemoveAt(randomIndex);
-            }
-
+        // If pattern system disabled or not enough lanes, fall back to random
+        if (!config.UsePatterns || availableLanes.Count < 2) {
+            RandomMultiPattern(availableLanes, selectedLanes, config);
             return selectedLanes;
         }
 
-        float patternRoll = Random.value;
+        int wall   = config.WallPatternWeight;
+        int zigzag = config.ZigZagPatternWeight;
+        int edges  = config.EdgePatternWeight;
 
-        // Wall pattern - spawn in consecutive lanes
-        if (patternRoll < wallPatternChance) {
-            int wallLength = Random.Range(2, 4);
-            int startLane  = Random.Range(0, Mathf.Max(1, 6 - wallLength));
+        int maxWeight = wall + zigzag + edges;
+        int roll = Random.Range(0, maxWeight);
 
-            for (int i = 0; i < wallLength && i < availableLanes.Count; i++) {
-                int lane = startLane + i;
-                if (!availableLanes.Contains(lane)) continue;
-                selectedLanes.Add(lane);
-            }
+        if (roll < wall) {
+            WallPattern(availableLanes, selectedLanes, config);
+        } else if (roll - wall < zigzag) {
+            ZigZagPattern(availableLanes, selectedLanes, config);
+        } else if (roll - wall - zigzag < edges) {
+            EdgesPattern(availableLanes, selectedLanes, config);
+        } else {
+            RandomMultiPattern(availableLanes, selectedLanes, config);
         }
-        // Zigzag pattern - spawn in alternating lanes
-        else if (patternRoll < wallPatternChance + zigzagPatternChance) {
-            for (int i = 0; i < 5; i += 2) {
-                if (!availableLanes.Contains(i)) continue;
-                selectedLanes.Add(i);
-            }
-        }
-        // Edges pattern - spawn only on outer lanes
-        else if (patternRoll < wallPatternChance + zigzagPatternChance + edgesPatternChance) {
-            if (availableLanes.Contains(0)) selectedLanes.Add(0);
-            if (availableLanes.Contains(4)) selectedLanes.Add(4);
-        }
-        // Default random multi-spawn
-        else {
-            int spawnCount = Random.value < multiLaneSpawnChance
-                ? Random.Range(minSimultaneousSpawns, maxSimultaneousSpawns + 1)
-                : 1;
-            spawnCount = Mathf.Min(spawnCount, availableLanes.Count);
-
-            for (int i = 0; i < spawnCount; i++) {
-                int randomIndex = Random.Range(0, availableLanes.Count);
-                selectedLanes.Add(availableLanes[randomIndex]);
-                availableLanes.RemoveAt(randomIndex);
-            }
-        }
-
-        // Fallback if no pattern selected
-        if (selectedLanes.Count != 0) return selectedLanes;
-        selectedLanes.Add(availableLanes[Random.Range(0, availableLanes.Count)]);
 
         return selectedLanes;
     }
+    
+    static void RandomMultiPattern(List<int> availableLanes, List<int> selectedLanes, EnemySpawnerConfig config) {
+        int spawnCount = Random.value < config.MultiLaneSpawnChance
+            ? Random.Range(config.MinSimultaneousSpawns, config.MaxSimultaneousSpawns + 1)
+            : 1;
+        spawnCount = Mathf.Min(spawnCount, availableLanes.Count);
 
-    void SpawnEnemyInLane(int laneIndex, float yOffset = 0f) {
-        GameObject enemyPrefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-        Vector3    spawnPos    = lanes[laneIndex].position;
-
-        // Apply position variation for natural traffic spacing (vertical/Y-axis)
-        spawnPos.y += yOffset;
-
-        GameObject newEnemy = Instantiate(enemyPrefab, spawnPos, Quaternion.identity);
-
-        // Set lane and pass game time reference
-        EnemyController controller = newEnemy.GetComponent<EnemyController>();
-        if (controller) {
-            controller.SetLane(laneIndex);
-            controller.SetSpawner(this);
-        }
-
-        // Track enemy
-        _laneEnemies[laneIndex].Add(newEnemy);
-    }
-
-    void CleanupDestroyedEnemies(int laneIndex) {
-        for (int i = _laneEnemies[laneIndex].Count - 1; i >= 0; i--) {
-            if (_laneEnemies[laneIndex][i]) continue;
-            _laneEnemies[laneIndex].RemoveAt(i);
+        for (int i = 0; i < spawnCount; i++) {
+            int randomIndex = Random.Range(0, availableLanes.Count);
+            selectedLanes.Add(availableLanes[randomIndex]);
+            availableLanes.RemoveAt(randomIndex);
         }
     }
+    static void EdgesPattern(List<int> availableLanes, List<int> selectedLanes, EnemySpawnerConfig config) {
+        if (availableLanes.Contains(0)) selectedLanes.Add(0);
+        if (availableLanes.Contains(config.Lanes - 1)) selectedLanes.Add(config.Lanes - 1);
+    }
+    static void ZigZagPattern(List<int> availableLanes, List<int> selectedLanes, EnemySpawnerConfig config) {
+        for (int i = 0; i < config.Lanes; i += 2) {
+            if (!availableLanes.Contains(i)) continue;
+            selectedLanes.Add(i);
+        }
+    }
+    static void WallPattern(List<int> availableLanes, List<int> selectedLanes, EnemySpawnerConfig config) {
+        int wallLength = Random.Range(2, config.Lanes - 1);
+        int startLane  = Random.Range(0, Mathf.Max(1, 6 - wallLength));
+
+        for (int i = 0; i < wallLength && i < availableLanes.Count; i++) {
+            int lane = startLane + i;
+            if (!availableLanes.Contains(lane)) continue;
+            selectedLanes.Add(lane);
+        }
+    }
+    #endregion
 }
