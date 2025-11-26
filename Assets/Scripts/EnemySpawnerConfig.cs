@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemySpawnerConfig : ScriptableObject {
     [Header("Lane Settings")]
     public int Lanes = 5;
-    public float LaneWidth = 2f;
+    [Tooltip("In units.")] public float LaneWidth = 2f;
     
     [Header("Spawn Config")]
     public float SpawnInterval = 2f;
@@ -34,8 +34,9 @@ public class EnemySpawnerConfig : ScriptableObject {
     public bool OffsetMultiSpawnsOnly = true;
 
     [Header("Boss Settings")]
-    public float BossSpawnTicks = 100;
-    public float BossSpawnChance = 0.25f;
+    [Tooltip("Delay between boss spawns")] public float BossSpawnDelay = 10f;
+    [Tooltip("Minimum delay between scene start and first boss spawn.")] public float BossSpawnInitDelay = 20f;
+    [Tooltip("Chance that a boss will spawn at the given opportunity."), Range(0, 1)] public float BossSpawnChance = 0.5f;
     
     [Header("Misc")]
     public GameObject LaneGuide;

@@ -9,7 +9,7 @@ public class EnemyController : MonoBehaviour {
     [SerializeField] internal float MaxMoveSpeed = 15f;
     public Vector3 MoveDirection = Vector3.down;
 
-    const byte Colour = 1;
+    const byte COLOUR = 1;
     
     [Header("Boundaries")]
     public float CurrentMoveSpeed { get; internal set; }
@@ -35,7 +35,7 @@ public class EnemyController : MonoBehaviour {
 
     void OnTriggerEnter2D(Collider2D other) {
         PlayerHealth health = other.GetComponent<PlayerHealth>();
-        health?.Damage(1, 1);
+        health?.Damage(1, COLOUR);
         if (health) Destroy(gameObject); 
     }
 }
