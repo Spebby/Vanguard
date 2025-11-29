@@ -1,9 +1,9 @@
 using Gilzoide.UpdateManager;
 using UnityEngine;
-using System; 
+using System;
 
-public class PlayerHealth : MonoBehaviour, IHealth, IFixedUpdatable
-{
+
+public class PlayerHealth : MonoBehaviour, IHealth, IFixedUpdatable {
     public event Action OnDeath;
 
     [SerializeField] int startingHealth;
@@ -15,26 +15,26 @@ public class PlayerHealth : MonoBehaviour, IHealth, IFixedUpdatable
     }
 
     [SerializeField] float invulnerabilityTime = 0.5f;
-
     float _iTime;
 
     void OnEnable() => this.RegisterInManager();
     void OnDisable() => this.UnregisterInManager();
 
+    public void Heal(int amount) {
+        Health += amount;
+    }
 
-    public void Heal(int amount) => Health += amount;
     public void Damage(int amount, byte colour) {
         if (Colour == colour || 0 < _iTime) return;
 
         Health -= amount;
-        _iTime = invulnerabilityTime;
+        _iTime  = invulnerabilityTime;
 
         if (Health <= 0) Die();
     }
 
     public void Die() {
         OnDeath?.Invoke();
-
         Destroy(gameObject);
     }
 
