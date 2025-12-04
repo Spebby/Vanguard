@@ -278,6 +278,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ccf257666e9c23451b67d409df509834, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Aiming
+  ReticleProp: {fileID: 2131443301178584409, guid: d13efe152067c048da0326b5158465ef, type: 3}
 --- !u!114 &3361512336848285733
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -292,6 +293,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Moving
   body: {fileID: 9034737592917506603}
   config: {fileID: 11400000, guid: 9941f6d06e87c8849a6e36d63511974b, type: 2}
+  lBound: {x: -4.4, y: 0, z: 0}
+  rBound: {x: 4.4, y: 0, z: 0}
 --- !u!114 &-1072031848706181691
 MonoBehaviour:
   m_ObjectHideFlags: 0

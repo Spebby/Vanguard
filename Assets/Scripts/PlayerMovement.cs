@@ -1,7 +1,6 @@
 using Gilzoide.UpdateManager;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static InputHelper;
 
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Runtime.Editor")]
@@ -9,25 +8,21 @@ using static InputHelper;
 public class PlayerMovement : MonoBehaviour, IFixedUpdatable {
     @InputSystem_Actions _actions;
     @InputSystem_Actions.PlayerActions _playerMap;
-    PlayerInput _input;
-    ControlScheme _activeScheme;
 
     [SerializeField] SpriteRenderer body;
     [SerializeField] internal VehicleConfig config;
     float _moveDir;
     
     DodgeManager _dodgeManager;
+    [SerializeField] Vector3 lBound;
+    [SerializeField] Vector3 rBound;
     
     void UpdateMoveDir(InputAction.CallbackContext ctx) => _moveDir = ctx.ReadValue<float>();
-    void UpdateControlScheme(PlayerInput obj) => _activeScheme = GetControlScheme(obj);
 
     #region Unity Boilerplate
     void Awake() {
         _actions   = new @InputSystem_Actions();
         _playerMap = _actions.Player;
-
-        _input                   =  GetComponent<PlayerInput>();
-        _input.onControlsChanged += UpdateControlScheme;
 
         if (config.Dodges > 0) {
             _dodgeManager = new DodgeManager(body, config);
@@ -36,7 +31,6 @@ public class PlayerMovement : MonoBehaviour, IFixedUpdatable {
 
     void OnEnable() {
         this.RegisterInManager();
-        UpdateControlScheme(_input);
 
         _actions.Enable();
         _playerMap.Move.performed += UpdateMoveDir;
@@ -58,6 +52,13 @@ public class PlayerMovement : MonoBehaviour, IFixedUpdatable {
 
     
     public void ManagedFixedUpdate() {
-        transform.position += (Vector3)(Vector2.right * (_moveDir * config.Speed * Time.fixedDeltaTime));
+        float newX = transform.position.x + _moveDir * config.Speed * Time.fixedDeltaTime;
+        transform.position = new Vector3(Mathf.Clamp(newX, lBound.x, rBound.x), transform.position.y, transform.position.z);
+    }
+
+    void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(lBound, 0.1f);
+        Gizmos.DrawWireSphere(rBound, 0.1f);
     }
 }

@@ -12,13 +12,16 @@ public class Aiming : MonoBehaviour, ILateUpdatable {
     ControlScheme _activeScheme;
 
     void UpdateControlScheme(PlayerInput obj) => _activeScheme = GetControlScheme(obj);
-    void StartLFire(InputAction.CallbackContext ctx) => _leftGun.StartShooting();
-    void StopLFire(InputAction.CallbackContext ctx)  => _leftGun.StopShooting();
-    void StartRFire(InputAction.CallbackContext obj) => _rightGun.StartShooting();
-    void StopRFire(InputAction.CallbackContext obj)  => _rightGun.StopShooting();
+    void StartLFire(InputAction.CallbackContext ctx) => _lGun.StartShooting();
+    void StopLFire(InputAction.CallbackContext ctx)  => _lGun.StopShooting();
+    void StartRFire(InputAction.CallbackContext obj) => _rGun.StartShooting();
+    void StopRFire(InputAction.CallbackContext obj)  => _rGun.StopShooting();
 
-    Gun _leftGun;
-    Gun _rightGun;
+    Gun _lGun;
+    Gun _rGun;
+
+    [SerializeField] GameObject ReticleProp;
+    GameObject[] Reticles = new GameObject[2];
 
     
     #region Unity Boilerplate
@@ -29,14 +32,18 @@ public class Aiming : MonoBehaviour, ILateUpdatable {
         }
         
         // fine for prototype
-        _leftGun  = guns[0];
-        _rightGun = guns[1];
+        _lGun  = guns[0];
+        _rGun = guns[1];
         
         _actions   = new @InputSystem_Actions();
         _playerMap = _actions.Player;
 
         _input = GetComponent<PlayerInput>();
         _input.onControlsChanged += UpdateControlScheme;
+
+        Vector3 tempPos = new(-99999, -99999, 99999);
+        Reticles[0] = Instantiate(ReticleProp, tempPos, Quaternion.identity);
+        Reticles[1] = Instantiate(ReticleProp, tempPos, Quaternion.identity);
     }
 
     void OnEnable() {
@@ -85,12 +92,15 @@ public class Aiming : MonoBehaviour, ILateUpdatable {
             _lReticle = Camera.main!.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             _rReticle = _lReticle;
         } else {
-            _lReticle = (Vector2)_leftGun.transform.position + _lAimDir;
-            _rReticle = (Vector2)_rightGun.transform.position + _rAimDir;
+            _lReticle = (Vector2)_lGun.transform.position + _lAimDir * 1.5f;
+            _rReticle = (Vector2)_rGun.transform.position + _rAimDir * 1.5f;
         }
-
-        _leftGun.Target  = _lReticle;
-        _rightGun.Target = _rReticle;
+        
+        Reticles[0].transform.position = _lReticle;
+        Reticles[1].transform.position = _rReticle;
+        
+        _lGun.Target  = _lReticle;
+        _rGun.Target = _rReticle;
     }
 
     Vector2 _lAimDir;
